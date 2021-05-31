@@ -47,7 +47,7 @@
             Please sign-in to your account and start the adventure
           </b-card-text>
 
-          <b-alert
+          <!-- <b-alert
             variant="primary"
             show
           >
@@ -66,7 +66,7 @@
               class="position-absolute"
               style="top: 10; right: 10;"
             />
-          </b-alert>
+          </b-alert> -->
 
           <!-- form -->
           <validation-observer
@@ -282,33 +282,33 @@ export default {
             password: this.password,
           })
             .then(response => {
-              const { userData } = response.data
-              useJwt.setToken(response.data.accessToken)
-              useJwt.setRefreshToken(response.data.refreshToken)
+              const userData = response.data.user
+              useJwt.setToken(response.data.user.token)
+              useJwt.setRefreshToken(response.data.user.token)
               localStorage.setItem('userData', JSON.stringify(userData))
-              this.$ability.update(userData.ability)
+              this.$ability.update([{"action":"manage","subject":"all"}])
 
               // ? This is just for demo purpose as well.
               // ? Because we are showing eCommerce app's cart items count in navbar
-              this.$store.commit('app-ecommerce/UPDATE_CART_ITEMS_COUNT', userData.extras.eCommerceCartItemsCount)
+              // this.$store.commit('app-ecommerce/UPDATE_CART_ITEMS_COUNT', userData.extras.eCommerceCartItemsCount)
 
               // ? This is just for demo purpose. Don't think CASL is role based in this case, we used role in if condition just for ease
-              this.$router.replace(getHomeRouteForLoggedInUser(userData.role))
+              this.$router.replace(getHomeRouteForLoggedInUser('admin'))
                 .then(() => {
                   this.$toast({
                     component: ToastificationContent,
                     position: 'top-right',
                     props: {
-                      title: `Welcome ${userData.fullName || userData.username}`,
+                      title: `Welcome ${userData.name || userData.email}`,
                       icon: 'CoffeeIcon',
                       variant: 'success',
-                      text: `You have successfully logged in as ${userData.role}. Now you can start to explore!`,
+                      text: `You have successfully logged in as admin. Now you can start to explore!`,
                     },
                   })
                 })
             })
             .catch(error => {
-              this.$refs.loginForm.setErrors(error.response.data.error)
+              this.$refs.loginForm.setErrors({email: ['Email or Password is Invalid']})
             })
         }
       })
